@@ -23,10 +23,11 @@ def plot_count_pca(count_df,
     pc2_variance = round(variance[1], 2)
 
     pca_df = pd.DataFrame(pca_result, columns=['PC1', 'PC2'], index=count_filter.columns)
+    if meta_df is not None:
+        merged_df = pca_df.join(meta_df, how='left')
     if plot:
         plt.figure(figsize=(8, 6))
         if meta_df is not None:
-            merged_df = pca_df.join(meta_df, how='left')
             markers = ['o', 's', '^', 'D', 'X', 'P', '*']
             if col2 and col2 in merged_df.columns:
                 for (color, shape), group in merged_df.groupby([col1, col2]):
@@ -45,5 +46,5 @@ def plot_count_pca(count_df,
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.grid()
         plt.show()
-    return pca_df
+    return pca_df, pc1_variance, pc2_variance
 
