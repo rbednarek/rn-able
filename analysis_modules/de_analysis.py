@@ -24,16 +24,16 @@ def plot_count_pca(count_df,
 
     pca_df = pd.DataFrame(pca_result, columns=['PC1', 'PC2'], index=count_filter.columns)
     if meta_df is not None:
-        merged_df = pca_df.join(meta_df, how='left')
+        pca_df = pca_df.join(meta_df, how='left')
     if plot:
         plt.figure(figsize=(8, 6))
         if meta_df is not None:
             markers = ['o', 's', '^', 'D', 'X', 'P', '*']
-            if col2 and col2 in merged_df.columns:
-                for (color, shape), group in merged_df.groupby([col1, col2]):
+            if col2 and col2 in pca_df.columns:
+                for (color, shape), group in pca_df.groupby([col1, col2]):
                     plt.scatter(group['PC1'], group['PC2'], label=f'{color}-{shape}', marker=markers[hash(shape) % len(markers)])
-            elif col1 and col1 in merged_df.columns:
-                for color, group in merged_df.groupby(col1):
+            elif col1 and col1 in pca_df.columns:
+                for color, group in pca_df.groupby(col1):
                     plt.scatter(group['PC1'], group['PC2'], label=color)
         else:
             plt.scatter(pca_df['PC1'], pca_df['PC2'])
