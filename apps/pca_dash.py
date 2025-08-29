@@ -1,5 +1,5 @@
 import dash
-from dash import dcc, html, Input, Output, State
+from dash import dcc, html, Input, Output, State, no_update
 import plotly.express as px
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -7,6 +7,7 @@ import io
 import base64
 import sys
 import os
+from io import StringIO
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from analysis_modules import *
 
@@ -56,8 +57,34 @@ app.layout = html.Div([
     ),
 
     dcc.Store(id='count-data-store'),
-    dcc.Store(id='metadata-store')
+    dcc.Store(id='metadata-store'),
+    
+    html.Div([
+        html.Hr(),
+        html.H3("Assign Sample Groups for DE"),
+        html.P("Group 1 should generally be control or reference samples."),
+
+        html.Div([
+            html.Button('Create Group 1', id='create-group1', n_clicks=0),
+            dcc.Input(id='group1-name', type='text', placeholder='ex. Healthy', style={'marginLeft': '10px'}),
+            html.Div(id='group1-samples', style={'marginTop': '5px', 'fontStyle': 'italic'}),
+        ], style={'marginBottom': '20px'}),
+
+        html.Div([
+            html.Button('Create Group 2', id='create-group2', n_clicks=0),
+            dcc.Input(id='group2-name', type='text', placeholder='ex. Diseased', style={'marginLeft': '10px'}),
+            html.Div(id='group2-samples', style={'marginTop': '5px', 'fontStyle': 'italic'}),
+        ], style={'marginBottom': '20px'}),
+
+        html.Button('Run DE Analysis', id='run-de', n_clicks=0),
+        html.Div(id='de-error-message', style={'color': 'red', 'marginTop': '10px'}),
+        dcc.Download(id='download-counts'),
+        dcc.Download(id='download-metadata'),
+    ], id='group-assign-container', style={'display': 'none', 'borderTop': '1px solid #ccc', 'paddingTop': '10px'}),
+    dcc.Store(id='group1-store'),
+    dcc.Store(id='group2-store')
 ])
+
 
 @app.callback(
     Output('counts-filename', 'children'),
@@ -104,7 +131,7 @@ def parse_contents(contents, filename):
 
 def upload_countdata(contents, filename):
     df = parse_contents(contents, filename)
-    return df.to_dict()
+    return df.to_dict(orient='split')
 
 @app.callback(
     Output('metadata-store', 'data'),
@@ -115,7 +142,7 @@ def upload_countdata(contents, filename):
 
 def upload_metadata(contents, filename):
     df = parse_contents(contents, filename)
-    return df.to_dict()
+    return df.to_dict(orient='split')
 
 @app.callback(
     Output('pca-plot-container', 'style'),
@@ -137,9 +164,9 @@ def show_pca_plot(n_clicks):
 def run_pca(n_clicks, counts_dict, meta_df_dict=None):
     col1 = None
     col2 = None
-    counts_df = pd.DataFrame.from_dict(counts_dict)
+    counts_df = pd.DataFrame(data=counts_dict['data'], index=counts_dict['index'], columns=counts_dict['columns'])
     if meta_df_dict:
-        meta_df = pd.DataFrame.from_dict(meta_df_dict)
+        meta_df = pd.DataFrame(data=meta_df_dict['data'], index=meta_df_dict['index'], columns=meta_df_dict['columns'])
         col1 = meta_df.columns[0]
         if len(meta_df.columns) > 1:
             col2 = meta_df.columns[1]
@@ -152,19 +179,110 @@ def run_pca(n_clicks, counts_dict, meta_df_dict=None):
                             col1=col1 if col1 else None,
                             col2=col2 if col2 else None)
     pca_df['sample'] = pca_df.index
-    print(pca_df)
-    fig = px.scatter(pca_df, x='PC1', y='PC2', hover_name='sample',
-                     color=col1 if meta_df is not None else 'blue',
-                     symbol=col2 if meta_df is not None and col2 else None,
-                     title='Sample PCA Plot',
-                     custom_data=['sample']
-                    )
+    if meta_df_dict:
+        fig = px.scatter(pca_df, x='PC1', y='PC2', hover_name='sample',
+                        color=col1 if meta_df is not None else 'blue',
+                        symbol=col2 if meta_df is not None and col2 else None,
+                        title='Sample PCA Plot',
+                        custom_data=['sample']
+                        )
+    else:
+        fig = px.scatter(pca_df, x='PC1', y='PC2', title='Sample PCA Plot')
     fig.update_layout(
         xaxis_title=f'PC1 ({pc1_variance:.2f}%)',
         yaxis_title=f'PC2 ({pc2_variance:.2f}%)'
     )
 
     return fig
+
+@app.callback(
+    Output('group-assign-container', 'style'),
+    Input('pca-plot', 'figure'),
+    Input('metadata-store', 'data')
+)
+
+def show_group_assign_controls(fig, metadata):
+    if fig and 'data' in fig and fig['data'] and metadata:
+        return {'display': 'block'}
+    return {'display': 'none'}
+
+
+@app.callback(
+    Output('group1-store', 'data'),
+    Output('group1-samples', 'children'),
+    Input('create-group1', 'n_clicks'),
+    State('pca-plot', 'selectedData'),
+    State('group1-name', 'value'),
+    prevent_initial_call=True
+)
+
+def create_group1(n_clicks, selectedData, group_name):
+    if n_clicks and selectedData and group_name:
+        selected_samples = [point['hovertext'] for point in selectedData['points']]
+        print(f'group1: {selected_samples}')
+        return selected_samples, f"Group 1: {group_name}"
+    return [], ""
+
+@app.callback(
+    Output('group2-store', 'data'),
+    Output('group2-samples', 'children'),
+    Input('create-group2', 'n_clicks'),
+    State('pca-plot', 'selectedData'),
+    State('group2-name', 'value'),
+    prevent_initial_call=True
+)
+
+def create_group2(n_clicks, selectedData, group_name):
+    if n_clicks and selectedData and group_name:
+        selected_samples = [point['hovertext'] for point in selectedData['points']]
+        print(f'group2: {selected_samples}')
+        return selected_samples, f"Group 2: {group_name}"
+    return [], ""
+
+@app.callback(
+    Output('download-counts', 'data'),
+    Output('download-metadata', 'data'),
+    Input('run-de', 'n_clicks'),
+    State('group1-store', 'data'),
+    State('group2-store', 'data'),
+    State('group1-name', 'value'),
+    State('group2-name', 'value'),
+    State('count-data-store', 'data'),
+    State('metadata-store', 'data'),
+    prevent_initial_call=True
+)
+def download_data(n_clicks, group1_samples, group2_samples, group1_name, group2_name, count_data, metadata):
+    if not group1_samples or not group2_samples:
+        return no_update, no_update
+    elif n_clicks and group1_samples and group2_samples:
+        counts_df = pd.DataFrame(data=count_data['data'], index=count_data['index'], columns=count_data['columns'])
+        meta_df = pd.DataFrame(data=metadata['data'], index=metadata['index'], columns=metadata['columns'])
+        counts_filter = counts_df[group1_samples + group2_samples]
+        meta_df_filter = meta_df.loc[group1_samples + group2_samples].copy()
+        meta_df_filter['group'] = ''
+        for _,row in meta_df_filter.iterrows():
+            if _ in group1_samples:
+                meta_df_filter.at[_, 'group'] = group1_name
+            elif _ in group2_samples:
+                meta_df_filter.at[_, 'group'] = group2_name 
+        counts_csv = StringIO()
+        meta_csv = StringIO()
+        counts_filter.to_csv(counts_csv)
+        meta_df_filter.to_csv(meta_csv)
+
+        return ({'content': counts_csv.getvalue(), 'filename': 'filtered_counts.csv'}, {'content': meta_csv.getvalue(), 'filename': 'filtered_metadata.csv'})
+
+@app.callback(
+    Output('de-error-message', 'children'),
+    Input('run-de', 'n_clicks'),
+    State('group1-store', 'data'),
+    State('group2-store', 'data'),
+    prevent_initial_call=True
+)
+def both_groups_check(n_clicks, group1_samples, group2_samples):
+    if not group1_samples or not group2_samples:
+        return "Must select groups 1 and 2 first"
+    return ""
 
 if __name__ == '__main__':
     app.run(debug=True)
