@@ -1,6 +1,7 @@
 import dash
 from dash import dcc, html, Input, Output, State, no_update
 import plotly.express as px
+from plotly.io import from_json, to_json
 import pandas as pd
 from sklearn.decomposition import PCA
 import io
@@ -81,6 +82,7 @@ app.layout = html.Div([
         dcc.Download(id='download-counts'),
         dcc.Download(id='download-metadata'),
     ], id='group-assign-container', style={'display': 'none', 'borderTop': '1px solid #ccc', 'paddingTop': '10px'}),
+    dcc.Store(id='pca-figure-store'),
     dcc.Store(id='group1-store'),
     dcc.Store(id='group2-store')
 ])
@@ -155,6 +157,7 @@ def show_pca_plot(n_clicks):
 
 @app.callback(
     Output('pca-plot', 'figure'),
+    Output('pca-figure-store', 'data'),
     Input('run-pca', 'n_clicks'),
     State('count-data-store', 'data'),
     State('metadata-store', 'data'),
@@ -193,7 +196,7 @@ def run_pca(n_clicks, counts_dict, meta_df_dict=None):
         yaxis_title=f'PC2 ({pc2_variance:.2f}%)'
     )
 
-    return fig
+    return fig, to_json(fig)
 
 @app.callback(
     Output('group-assign-container', 'style'),
@@ -212,14 +215,26 @@ def show_group_assign_controls(fig, metadata):
     Output('group1-samples', 'children'),
     Input('create-group1', 'n_clicks'),
     State('pca-plot', 'selectedData'),
+    State('pca-plot', 'relayoutData'),
     State('group1-name', 'value'),
+    State('pca-figure-store', 'data'),
     prevent_initial_call=True
 )
 
-def create_group1(n_clicks, selectedData, group_name):
+def create_group1(n_clicks, selectedData, relayoutData, group_name, fig_json):
     if n_clicks and selectedData and group_name:
-        selected_samples = [point['hovertext'] for point in selectedData['points']]
-        print(f'group1: {selected_samples}')
+        fig = from_json(fig_json)
+        if relayoutData:
+            hidden_labels = set(relayoutData.get('hiddenlabels', []))
+        else:
+            hidden_labels = set() 
+        curve_to_trace = {i: trace.name for i, trace in enumerate(fig.data)}    
+        selected_samples = []
+        for point in selectedData['points']:
+            curve_num = point['curveNumber']
+            trace_name = curve_to_trace.get(curve_num, '')
+            if trace_name not in hidden_labels:
+                selected_samples.append(point['hovertext'])
         return selected_samples, f"Group 1: {group_name}"
     return [], ""
 
@@ -228,14 +243,26 @@ def create_group1(n_clicks, selectedData, group_name):
     Output('group2-samples', 'children'),
     Input('create-group2', 'n_clicks'),
     State('pca-plot', 'selectedData'),
+    State('pca-plot', 'relayoutData'),
     State('group2-name', 'value'),
+    State('pca-figure-store', 'data'),
     prevent_initial_call=True
 )
 
-def create_group2(n_clicks, selectedData, group_name):
+def create_group2(n_clicks, selectedData, relayoutData, group_name, fig_json):
     if n_clicks and selectedData and group_name:
-        selected_samples = [point['hovertext'] for point in selectedData['points']]
-        print(f'group2: {selected_samples}')
+        fig = from_json(fig_json)
+        if relayoutData:
+            hidden_labels = set(relayoutData.get('hiddenlabels', []))
+        else:
+            hidden_labels = set()
+        curve_to_trace = {i: trace.name for i, trace in enumerate(fig.data)}
+        selected_samples = []
+        for point in selectedData['points']:
+            curve_num = point['curveNumber']
+            trace_name = curve_to_trace.get(curve_num, '')
+            if trace_name not in hidden_labels:
+                selected_samples.append(point['hovertext'])
         return selected_samples, f"Group 2: {group_name}"
     return [], ""
 
