@@ -9,6 +9,7 @@ from rpy2.robjects import pandas2ri, default_converter
 from rpy2.robjects.conversion import localconverter
 
 
+
 def plot_count_pca(count_df, 
                    raw_count=10, 
                    min_samples=3, 
@@ -82,20 +83,20 @@ def run_de_analysis(counts_df, meta_df, group1, group2, cat_col='group'):
     Outputs:
     - res_df: DataFrame with differential expression results
     '''
-    base = importr('base')
-    deseq2 = importr('DESeq2')
+
     meta_df[cat_col] = pd.Categorical(meta_df[cat_col], categories=[group1, group2])
     with localconverter(default_converter + pandas2ri.converter):
         r_counts_df = pandas2ri.py2rpy(counts_df)
         r_meta_df = pandas2ri.py2rpy(meta_df)
-    dds = deseq2.DESeqDataSetFromMatrix(
-        countData=r_counts_df,
-        colData=r_meta_df,
-        design=ro.Formula('~ group')
-    )
-    dds = deseq2.DESeq(dds)
-    res = deseq2.results(dds)
-    res_df_r = base.as_data_frame(res)
-    with localconverter(default_converter + pandas2ri.converter):
-        res_df = pandas2ri.rpy2py(res_df_r)
+        base = importr('base')
+        deseq2 = importr('DESeq2')
+        dds = deseq2.DESeqDataSetFromMatrix(
+            countData=r_counts_df,
+            colData=r_meta_df,
+            design=ro.Formula('~ group')
+        )
+        dds = deseq2.DESeq(dds)
+        res = deseq2.results(dds)
+        res_df = base.as_data_frame(res)
+
     return res_df

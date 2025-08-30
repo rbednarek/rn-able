@@ -11,15 +11,22 @@ import os
 from io import StringIO
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from analysis_modules import *
+import rpy2.robjects as ro
+from rpy2.robjects.packages import importr
+from rpy2.robjects import pandas2ri, default_converter
+from rpy2.robjects.conversion import localconverter
+#import contextvars
 
 
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
-app.title = "Differential Expression Analysis"
+app.title = "RN-able - Differential Expression Analysis"
 
 app.layout = html.Div([
-    html.H1("Differential Expression Analysis"),
+    html.H1("RN-able"),
+    html.H2("Differential Expression Analysis"),
     html.Div([
+        html.H3("Sample Clustering Analysis"),
         html.Label("Upload Count Data:"),
         html.Div([
             dcc.Upload(
@@ -46,7 +53,7 @@ app.layout = html.Div([
         html.Button("Run PCA", id='run-pca', n_clicks=0),
     ], style={"padding": "20px", "border": "1px solid #ccc", "margin-bottom": "20px"}),
 
-    html.Hr(),
+    #html.Hr(),
     dcc.Loading(
         id='loading-pca',
         children=html.Div(
@@ -62,25 +69,31 @@ app.layout = html.Div([
     
     html.Div([
         html.Hr(),
-        html.H3("Assign Sample Groups for DE"),
-        html.P("Group 1 should generally be control or reference samples."),
+        html.H3("Differential Expression Analysis"),
+        html.P("Define sample groups using lasso or box tool before running analysis. Filter treatment groups by toggling the legend."),
+        html.P("(Analysis may take a little while)"),
 
         html.Div([
-            html.Button('Create Group 1', id='create-group1', n_clicks=0),
+            html.Button('Define Control Group', id='create-group1', n_clicks=0),
             dcc.Input(id='group1-name', type='text', placeholder='ex. Healthy', style={'marginLeft': '10px'}),
             html.Div(id='group1-samples', style={'marginTop': '5px', 'fontStyle': 'italic'}),
         ], style={'marginBottom': '20px'}),
 
         html.Div([
-            html.Button('Create Group 2', id='create-group2', n_clicks=0),
+            html.Button('Define Treatment Group', id='create-group2', n_clicks=0),
             dcc.Input(id='group2-name', type='text', placeholder='ex. Diseased', style={'marginLeft': '10px'}),
             html.Div(id='group2-samples', style={'marginTop': '5px', 'fontStyle': 'italic'}),
         ], style={'marginBottom': '20px'}),
-
-        html.Button('Run DE Analysis', id='run-de', n_clicks=0),
-        html.Div(id='de-error-message', style={'color': 'red', 'marginTop': '10px'}),
-        dcc.Download(id='download-counts'),
-        dcc.Download(id='download-metadata'),
+    dcc.Loading(
+        id='loading-de-analysis',
+        type='default',
+        children=html.Div([
+            html.Button('Run DE Analysis', id='run-de', n_clicks=0),
+            html.Div(id='de-error-message', style={'color': 'red', 'marginTop': '10px'}),
+            dcc.Download(id='download-deresults'),
+            dcc.Download(id='download-metadata'),
+        ])
+    )
     ], id='group-assign-container', style={'display': 'none', 'borderTop': '1px solid #ccc', 'paddingTop': '10px'}),
     dcc.Store(id='pca-figure-store'),
     dcc.Store(id='group1-store'),
@@ -235,7 +248,7 @@ def create_group1(n_clicks, selectedData, relayoutData, group_name, fig_json):
             trace_name = curve_to_trace.get(curve_num, '')
             if trace_name not in hidden_labels:
                 selected_samples.append(point['hovertext'])
-        return selected_samples, f"Group 1: {group_name}"
+        return selected_samples, f"Control Group: {group_name}"
     return [], ""
 
 @app.callback(
@@ -263,11 +276,11 @@ def create_group2(n_clicks, selectedData, relayoutData, group_name, fig_json):
             trace_name = curve_to_trace.get(curve_num, '')
             if trace_name not in hidden_labels:
                 selected_samples.append(point['hovertext'])
-        return selected_samples, f"Group 2: {group_name}"
+        return selected_samples, f"Treatment Group: {group_name}"
     return [], ""
 
 @app.callback(
-    Output('download-counts', 'data'),
+    Output('download-deresults', 'data'),
     Output('download-metadata', 'data'),
     Input('run-de', 'n_clicks'),
     State('group1-store', 'data'),
@@ -278,7 +291,7 @@ def create_group2(n_clicks, selectedData, relayoutData, group_name, fig_json):
     State('metadata-store', 'data'),
     prevent_initial_call=True
 )
-def download_data(n_clicks, group1_samples, group2_samples, group1_name, group2_name, count_data, metadata):
+def run_de(n_clicks, group1_samples, group2_samples, group1_name, group2_name, count_data, metadata):
     if not group1_samples or not group2_samples:
         return no_update, no_update
     elif n_clicks and group1_samples and group2_samples:
@@ -291,13 +304,13 @@ def download_data(n_clicks, group1_samples, group2_samples, group1_name, group2_
             if _ in group1_samples:
                 meta_df_filter.at[_, 'group'] = group1_name
             elif _ in group2_samples:
-                meta_df_filter.at[_, 'group'] = group2_name 
-        counts_csv = StringIO()
+                meta_df_filter.at[_, 'group'] = group2_name
+        res_df = run_de_analysis(counts_filter, meta_df_filter, group1_name, group2_name)
         meta_csv = StringIO()
-        counts_filter.to_csv(counts_csv)
         meta_df_filter.to_csv(meta_csv)
-
-        return ({'content': counts_csv.getvalue(), 'filename': 'filtered_counts.csv'}, {'content': meta_csv.getvalue(), 'filename': 'filtered_metadata.csv'})
+        de_results_csv = StringIO()
+        res_df.to_csv(de_results_csv)
+        return {'content': de_results_csv.getvalue(), 'filename': f'{group2_name}_v_{group1_name}_de_results.csv'}, {'content': meta_csv.getvalue(), 'filename': f'{group2_name}_v_{group1_name}_metadata.csv'}
 
 @app.callback(
     Output('de-error-message', 'children'),
