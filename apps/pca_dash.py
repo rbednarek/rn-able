@@ -53,7 +53,6 @@ app.layout = html.Div([
         html.Button("Run PCA", id='run-pca', n_clicks=0),
     ], style={"padding": "20px", "border": "1px solid #ccc", "margin-bottom": "20px"}),
 
-    #html.Hr(),
     dcc.Loading(
         id='loading-pca',
         children=html.Div(
@@ -68,7 +67,6 @@ app.layout = html.Div([
     dcc.Store(id='metadata-store'),
     
     html.Div([
-        html.Hr(),
         html.H3("Differential Expression Analysis"),
         html.P("Define sample groups using lasso or box tool before running analysis. Filter treatment groups by toggling the legend."),
         html.P("(Analysis may take a little while)"),
@@ -84,17 +82,19 @@ app.layout = html.Div([
             dcc.Input(id='group2-name', type='text', placeholder='ex. Diseased', style={'marginLeft': '10px'}),
             html.Div(id='group2-samples', style={'marginTop': '5px', 'fontStyle': 'italic'}),
         ], style={'marginBottom': '20px'}),
-    dcc.Loading(
-        id='loading-de-analysis',
-        type='default',
-        children=html.Div([
-            html.Button('Run DE Analysis', id='run-de', n_clicks=0),
-            html.Div(id='de-error-message', style={'color': 'red', 'marginTop': '10px'}),
-            dcc.Download(id='download-deresults'),
-            dcc.Download(id='download-metadata'),
-        ])
-    )
-    ], id='group-assign-container', style={'display': 'none', 'borderTop': '1px solid #ccc', 'paddingTop': '10px'}),
+        dcc.Loading(
+            id='loading-de-analysis',
+            type='default',
+            children=html.Div([
+                html.Button('Run DE Analysis', id='run-de', n_clicks=0),
+                html.Div(id='de-error-message', style={'color': 'red', 'marginTop': '10px'}),
+                dcc.Download(id='download-deresults'),
+                dcc.Download(id='download-metadata'),
+            ])
+        )
+    ], 
+    id='group-assign-container', 
+    style={'display': 'none', 'border': '1px solid #ccc', 'padding': '20px', 'margin-bottom': '20px'}),
     dcc.Store(id='pca-figure-store'),
     dcc.Store(id='group1-store'),
     dcc.Store(id='group2-store')
@@ -219,7 +219,7 @@ def run_pca(n_clicks, counts_dict, meta_df_dict=None):
 
 def show_group_assign_controls(fig, metadata):
     if fig and 'data' in fig and fig['data'] and metadata:
-        return {'display': 'block'}
+        return {'display': 'block', 'border': '1px solid #ccc', 'padding': '20px', 'margin-bottom': '20px'}
     return {'display': 'none'}
 
 
