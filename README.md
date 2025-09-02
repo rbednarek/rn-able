@@ -1,11 +1,9 @@
 ![RN-able Application Suite](docs/images/rnable.png)
 ## Web applications for exploratory RNA-Seq Analysis
-
 ---
 
 ## Differential Expression Analysis Quick Start Guide
 ![DE application](docs/images/rnable_de_analysis.png)
-
 ---
 
 ### Step 1: Clone the Repository
@@ -86,7 +84,6 @@ If you encounter any issues:
 3. **Port Already in Use**: If the default port is occupied, the application will typically find an available port automatically, otherwise manually update the port in pca_dash.py script.
 
 ## Requirements
-
 ---
 
 - Python 3.10+
