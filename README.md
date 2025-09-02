@@ -43,7 +43,7 @@ python pca_dash.py
 ```
 
 The application will start and display a local URL (typically `http://127.0.0.1:8050/`) where you can access the dashboard in your web browser.
-
+---
 ## Tutorial Dataset
 
 For tutorial and testing purposes, we've included sample datasets in the `test_datasets` folder:
