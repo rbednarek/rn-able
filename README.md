@@ -1,10 +1,12 @@
 ![RN-able Application Suite](docs/images/rnable.png)
 ## Web applications for exploratory RNA-Seq Analysis
 
-
+---
 
 ## Differential Expression Analysis Quick Start Guide
 ![DE application](docs/images/rnable_de_analysis.png)
+
+---
 
 ### Step 1: Clone the Repository
 
@@ -75,6 +77,8 @@ These files provide a complete example of the expected data format and can be us
 
 ## Troubleshooting
 
+---
+
 If you encounter any issues:
 
 1. **Environment Setup Problems**: Ensure you have conda installed and the setup script has execute permissions (`chmod +x setup_environment.sh`)
@@ -83,10 +87,14 @@ If you encounter any issues:
 
 ## Requirements
 
+---
+
 - Python 3.10+
 - Conda package manager
 
 ## Data Format Requirements
+
+---
 
 - **Raw Counts**: Tab or comma separated values file (can be .gz compressed)
 - **Metadata**: Tab or comma separated file with sample information matching the raw counts columns
@@ -96,4 +104,4 @@ If you encounter any issues:
 For additional support or questions, please refer to the application documentation or contact the development team.
 
 
-# Secondary Analysis Applications Coming Soon!
+# Secondary Analysis Application Coming Soon!
