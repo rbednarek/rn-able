@@ -46,6 +46,8 @@ The application will start and display a local URL (typically `http://127.0.0.1:
 
 ## Tutorial Dataset
 
+---
+
 For tutorial and testing purposes, we've included sample datasets in the `test_datasets` folder:
 
 - **Raw Counts Data**: `GSE228582_raw_counts_GRCh38.p13_NCBI.tsv.gz`
