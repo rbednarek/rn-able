@@ -51,7 +51,7 @@ For tutorial and testing purposes, we've included sample datasets in the `test_d
 - **Raw Counts Data**: `GSE228582_raw_counts_GRCh38.p13_NCBI.tsv.gz`
 - **Metadata**: `GSE228582_metadata.csv`
 
-These files provide a complete example of the expected data format and can be used to familiarize yourself with the application's functionality. Data was obtained from the Gene Expression Omnibus (GSE228582)
+These files provide a complete example of the expected data format and can be used to familiarize yourself with the application's functionality. Data was obtained from the Gene Expression Omnibus ([GSE228582](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE228582))
 
 ### Example Analysis
 
@@ -59,37 +59,16 @@ These files provide a complete example of the expected data format and can be us
 2. In the file upload interface, select:
    - Raw counts file: `test_datasets/GSE228582_raw_counts_GRCh38.p13_NCBI.tsv.gz`
    - Metadata file: `test_datasets/GSE228582_metadata.csv`
-3. Follow the on-screen instructions to perform PCA analysis
 
-## Screenshots
+![App Prep](docs/images/rnable_fileselect.png)
 
-<!-- Insert screenshot of application homepage here -->
-**Application Homepage**
+3. After generating the PCA, use either the Box Select or Lasso tool to select control samples. Name the control group before defining. Repeat this process for treatment group. 
 
-[Screenshot placeholder - Add your homepage screenshot here]
+![PCA select](docs/images/rnable_pca_boxselect.png)
+![Group select](docs/images/rnable_groupselect.png)
+![DE Analysis](docs/images/rnable_highlight_group1.png)
+4. Run analysis and download DE results and user-defined sample meta data.
 
----
-
-<!-- Insert screenshot of file upload interface here -->
-**File Upload Interface**
-
-[Screenshot placeholder - Add your file upload interface screenshot here]
-
----
-
-<!-- Insert screenshot of PCA results visualization here -->
-**PCA Results Visualization**
-
-[Screenshot placeholder - Add your PCA visualization screenshot here]
-
----
-
-<!-- Insert screenshot of data exploration features here -->
-**Data Exploration Features**
-
-[Screenshot placeholder - Add your data exploration screenshot here]
-
----
 
 ## Troubleshooting
 
@@ -97,19 +76,21 @@ If you encounter any issues:
 
 1. **Environment Setup Problems**: Ensure you have conda installed and the setup script has execute permissions (`chmod +x setup_environment.sh`)
 2. **Missing Dependencies**: Re-run the setup script or manually install missing packages with `conda install` or `pip install`
-3. **Port Already in Use**: If the default port is occupied, the application will typically find an available port automatically
+3. **Port Already in Use**: If the default port is occupied, the application will typically find an available port automatically, otherwise manually update the port in pca_dash.py script.
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.10+
 - Conda package manager
-- Sufficient RAM for processing large genomic datasets
 
 ## Data Format Requirements
 
-- **Raw Counts**: Tab-separated values file (.tsv) or compressed (.tsv.gz)
-- **Metadata**: CSV file with sample information matching the raw counts columns
+- **Raw Counts**: Tab or comma separated values file (can be .gz compressed)
+- **Metadata**: Tab or comma separated file with sample information matching the raw counts columns
 
 ---
 
 For additional support or questions, please refer to the application documentation or contact the development team.
+
+
+# Secondary Analysis Applications Coming Soon!
