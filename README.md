@@ -1,10 +1,8 @@
 ![RN-able Application Suite](docs/images/rnable.png)
 ## Web applications for exploratory RNA-Seq Analysis
----
 
 ## Differential Expression Analysis Quick Start Guide
 ![DE application](docs/images/rnable_de_analysis.png)
----
 
 ### Step 1: Clone the Repository
 
@@ -46,8 +44,6 @@ The application will start and display a local URL (typically `http://127.0.0.1:
 
 ## Tutorial Dataset
 
----
-
 For tutorial and testing purposes, we've included sample datasets in the `test_datasets` folder:
 
 - **Raw Counts Data**: `GSE228582_raw_counts_GRCh38.p13_NCBI.tsv.gz`
@@ -75,8 +71,6 @@ These files provide a complete example of the expected data format and can be us
 
 ## Troubleshooting
 
----
-
 If you encounter any issues:
 
 1. **Environment Setup Problems**: Ensure you have conda installed and the setup script has execute permissions (`chmod +x setup_environment.sh`)
@@ -84,19 +78,14 @@ If you encounter any issues:
 3. **Port Already in Use**: If the default port is occupied, the application will typically find an available port automatically, otherwise manually update the port in pca_dash.py script.
 
 ## Requirements
----
 
 - Python 3.10+
 - Conda package manager
 
 ## Data Format Requirements
 
----
-
 - **Raw Counts**: Tab or comma separated values file (can be .gz compressed)
 - **Metadata**: Tab or comma separated file with sample information matching the raw counts columns
-
----
 
 For additional support or questions, please refer to the application documentation or contact the development team.
 
