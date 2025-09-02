@@ -13,10 +13,10 @@ cd rn-able
 
 ### Step 2: Set Up Conda Environment
 
-Run the setup_environment script to create a new conda environment and install all required dependencies:
+Run the config script to create a new conda environment and install all required dependencies:
 
 ```bash
-./setup_environment.sh
+./config.sh
 ```
 
 This script will:
