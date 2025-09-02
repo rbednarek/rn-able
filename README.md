@@ -1,7 +1,7 @@
-# RN-able
+![RN-able Application Suite](docs/images/rnable.png)
 ## Web applications for exploratory RNA-Seq Analysis
 
-![RN-able Application Suite](docs/images/rnable.png)
+
 
 ## Differential Expression Analysis Quick Start Guide
 ![DE application](docs/images/rnable_de_analysis.png)
