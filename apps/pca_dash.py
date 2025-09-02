@@ -19,7 +19,10 @@ from rpy2.robjects.conversion import localconverter
 
 
 
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
+app = dash.Dash(__name__, suppress_callback_exceptions=True,
+                 external_stylesheets=[
+        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
+    ])
 app.title = "RN-able - Differential Expression Analysis"
 
 app.layout = html.Div([
