@@ -64,48 +64,28 @@ conda update -n base -c defaults conda -y
 
 
 echo "Creating rnable environment with required packages..."
-conda create -n rnable -c conda-forge -y \
+conda create -n rnable -y -c conda-forge \
     python=3.10 \
-    r-base \
+    r-base=4.3 \
+    r-biocmanager \
+    rpy2 \
+    jq \
+    zlib \
     dash \
     plotly \
     pandas \
     scikit-learn \
     matplotlib \
-    rpy2 \
     libstdcxx-ng
 
+echo "✅ Base environment created. Activating environment..."
+conda activate rnable
+
+echo "📦 Installing DESeq2 and Bioconductor dependencies from bioconda..."
+conda install -y -c bioconda -c conda-forge bioconductor-deseq2 -y
 
 echo "Activating rnable environment..."
 source "$MINICONDA_DIR/bin/activate" rnable
-
-echo "Installing R packages (BiocManager and DESeq2)..."
-Rscript -e "
-# Install BiocManager if not already installed
-if (!requireNamespace('BiocManager', quietly = TRUE)) {
-    install.packages('BiocManager', repos='https://cran.r-project.org/')
-}
-
-# Load BiocManager
-library(BiocManager)
-
-# Install DESeq2
-BiocManager::install('DESeq2', ask = FALSE, update = FALSE)
-
-# Verify installations
-cat('Checking installed packages...\n')
-if (requireNamespace('BiocManager', quietly = TRUE)) {
-    cat('✓ BiocManager installed successfully\n')
-} else {
-    cat('✗ BiocManager installation failed\n')
-}
-
-if (requireNamespace('DESeq2', quietly = TRUE)) {
-    cat('✓ DESeq2 installed successfully\n')
-} else {
-    cat('✗ DESeq2 installation failed\n')
-}
-"
 
 echo "Configuring automatic activation of rnable environment..."
 

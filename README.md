@@ -60,11 +60,15 @@ These files provide a complete example of the expected data format and can be us
 
 ![App Prep](docs/images/rnable_fileselect.png)
 
-3. After generating the PCA, use either the Box Select or Lasso tool to select control samples. Name the control group before defining. Repeat this process for treatment group. 
+3. After generating the PCA, use either the Box Select or Lasso tool to select samples. 
 
 ![PCA select](docs/images/rnable_pca_boxselect.png)
+Select Control Group Samples
 ![DE Analysis](docs/images/rnable_highlight_group1.png)
+Name Group and Define
 ![Group select](docs/images/rnable_groupselect.png)
+
+Repeat this process for treatment group. 
 
 4. Run analysis and download DE results and user-defined sample meta data.
 
