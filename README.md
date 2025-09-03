@@ -65,6 +65,7 @@ These files provide a complete example of the expected data format and can be us
 ![PCA select](docs/images/rnable_pca_boxselect.png)
 Select Control Group Samples (by condition, cluster or both)
 ![DE Analysis](docs/images/rnable_highlight_group1.png)
+
 Name Group and Define
 ![Group select](docs/images/rnable_groupselect.png)
 
