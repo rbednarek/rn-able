@@ -16,7 +16,7 @@ cd rn-able
 Run the config script to create a new conda environment and install all required dependencies:
 
 ```bash
-./config.sh
+bash ./config.sh
 ```
 
 This script will:
