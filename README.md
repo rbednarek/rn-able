@@ -78,7 +78,7 @@ Repeat this process for treatment group.
 
 If you encounter any issues:
 
-1. **Environment Setup Problems**: Ensure you have conda installed and the setup script has execute permissions (`chmod +x setup_environment.sh`)
+1. **Environment Setup Problems**: Ensure you have conda installed and the config script has execute permissions (`chmod +x config.sh`)
 2. **Missing Dependencies**: Re-run the setup script or manually install missing packages with `conda install` or `pip install`
 3. **Port Already in Use**: If the default port is occupied, the application will typically find an available port automatically, otherwise manually update the port in pca_dash.py script.
 
