@@ -31,9 +31,9 @@ After the setup script completes, activate the conda environment if necessary:
 conda activate rnable
 ```
 
-### Step 4: Launch the PCA Dash Application
+### Step 4: Launch the Application
 
-Navigate to the apps folder and run the Dash application:
+Navigate to the apps folder and run:
 
 ```bash
 cd apps
@@ -53,7 +53,7 @@ These files provide a complete example of the expected data format and can be us
 
 ### Example Analysis
 
-1. Launch the PCA Dash application
+1. Launch the application
 2. In the file upload interface, select:
    - Raw counts file: `test_datasets/GSE228582_raw_counts_GRCh38.p13_NCBI.tsv.gz`
    - Metadata file: `test_datasets/GSE228582_metadata.csv`
@@ -63,7 +63,7 @@ These files provide a complete example of the expected data format and can be us
 3. After generating the PCA, use either the Box Select or Lasso tool to select samples. 
 
 ![PCA select](docs/images/rnable_pca_boxselect.png)
-Select Control Group Samples
+Select Control Group Samples (by condition, cluster or both)
 ![DE Analysis](docs/images/rnable_highlight_group1.png)
 Name Group and Define
 ![Group select](docs/images/rnable_groupselect.png)
