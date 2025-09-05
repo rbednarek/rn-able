@@ -1,5 +1,5 @@
 ![RN-able Application Suite](docs/images/rnable.png)
-## Web applications for exploratory RNA-Seq Analysis
+## Web application for exploratory RNA-Seq Analysis
 
 ## Differential Expression Analysis Quick Start Guide
 ![DE application](docs/images/rnable_de_analysis.png)
@@ -95,4 +95,4 @@ If you encounter any issues:
 For additional support or questions, please refer to the application documentation or contact the development team.
 
 
-# Secondary Analysis Application Coming Soon!
+# Secondary Analysis Functionality Coming Soon!
